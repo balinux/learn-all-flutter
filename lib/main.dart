@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:learn_flex/Api/api.dart';
+import 'package:http/http.dart' show Client;
+import 'package:learn_flex/Model/user_profile.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -26,39 +30,54 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        body: FutureBuilder(
+          future: AllPost().getListUser(),
+          builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("${snapshot.error.toString()}"),
+              );
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              List<User> users = snapshot.data;
+              // print(listuser);
+              return Container(
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    User user = users[index];
+                    // print(user);
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 1.0),
+                      child: Column(
+                        children: <Widget>[Text(user.title)],
+                      ),
+                    );
+                  },
+                  itemCount: users.length,
+                ),
+              );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        )
+
+        //       body: ListView(
+        //   children: <Widget>[
+        //     Padding(
+        //       padding: EdgeInsets.all(8),
+        //       child: Text("android Exmaple"),
+        //     )
+        //   ],
+        // )
+
+        );
   }
 }
