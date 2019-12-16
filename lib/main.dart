@@ -4,6 +4,8 @@ import 'package:http/http.dart' show Client;
 import 'package:learn_flex/Model/user_profile.dart';
 import 'dart:async';
 
+import 'package:learn_flex/letter.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -33,8 +35,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context, new MaterialPageRoute(builder: (context) => Letter()));
+          },
+        ),
         appBar: AppBar(
           title: Text(widget.title),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.menu),
+              color: Colors.white,
+              onPressed: () {
+                print('example');
+              },
+            )
+          ],
         ),
         body: FutureBuilder(
           future: AllPost().getListUser(),
