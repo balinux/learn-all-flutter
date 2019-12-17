@@ -1,100 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:learn_flex/Api/api.dart';
-import 'package:http/http.dart' show Client;
-import 'package:learn_flex/Model/user_profile.dart';
 import 'dart:async';
+import 'package:learn_flex/Model/user_profile.dart';
+import 'package:learn_flex/Api/Services.dart';
 
-import 'package:learn_flex/letter.dart';
+void main() {
+  runApp(MaterialApp(
+    title: 'My app',
+    home: MyApp(),
+  ));
+}
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  List<User> users = List();
+
+  @override
+  void initState() {
+    super.initState();
+    Services.getUsers().then((userFromServer) {
+      print(userFromServer);
+      setState(() {
+        users = userFromServer;
+      });
+    });
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context, new MaterialPageRoute(builder: (context) => Letter()));
-          },
-        ),
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.menu),
-              color: Colors.white,
-              onPressed: () {
-                print('example');
+      appBar: AppBar(
+        title: Text(" Search"),
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemCount: users.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          users[index].name,
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
+                        ),
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          users[index].email,
+                          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                        )
+                      ],
+                    ),
+                  ),
+                );
               },
-            )
-          ],
-        ),
-        body: FutureBuilder(
-          future: AllPost().getListUser(),
-          builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("${snapshot.error.toString()}"),
-              );
-            } else if (snapshot.connectionState == ConnectionState.done) {
-              List<User> users = snapshot.data;
-              // print(listuser);
-              return Container(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    User user = users[index];
-                    // print(user);
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 1.0),
-                      child: Column(
-                        children: <Widget>[Text(user.title)],
-                      ),
-                    );
-                  },
-                  itemCount: users.length,
-                ),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        )
-
-        //       body: ListView(
-        //   children: <Widget>[
-        //     Padding(
-        //       padding: EdgeInsets.all(8),
-        //       child: Text("android Exmaple"),
-        //     )
-        //   ],
-        // )
-
-        );
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
