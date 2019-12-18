@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:learn_flex/single_post_with_model.dart';
 
 Future<Post> fetchPost() async {
   final response =
@@ -67,6 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              new MaterialPageRoute(builder: (context) => SinglePost()));
+        },
+      ),
       appBar: AppBar(
         title: Text(widget.title),
       ),
