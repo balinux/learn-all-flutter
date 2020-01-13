@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'model/moviedb.dart';
+import 'package:learn_flex/api/service.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,39 +28,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('example'),
+      ),
+      body: FutureBuilder(
+        future: MovieRepository().getNowPlaying(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return new MovieList(playing: snapshot.data);
+          }
+        },
+      ),
+    );
+  }
+}
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+class MovieList extends StatefulWidget {
+  final Moviedb playing;
+  MovieList({this.playing, Key key}) : super(key: key);
+  @override
+  _MovieListState createState() => _MovieListState();
+}
+
+class _MovieListState extends State<MovieList> {
+  List<Result> movie;
+
+  @override
+  void initState() {
+    movie = widget.playing.results;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    return ListView.builder(
+      itemCount: movie.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[Text(movie[index].title)],
+          ),
+        );
+      },
     );
   }
 }
