@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('example'),
       ),
       body: FutureBuilder(
-        future: MovieRepository().getNowPlaying(),
+        future: MovieRepository().getNowPlaying(1),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Center(
@@ -58,7 +58,26 @@ class MovieList extends StatefulWidget {
 }
 
 class _MovieListState extends State<MovieList> {
+  ScrollController scrollController = new ScrollController();
   List<Result> movie;
+  int currentPage = 1;
+
+  bool onNotificationHandler(ScrollNotification notification) {
+    if (notification is ScrollUpdateNotification) {
+      if (scrollController.position.maxScrollExtent > scrollController.offset &&
+          scrollController.position.maxScrollExtent - scrollController.offset <=
+              50) {
+        print('End Scroll');
+        MovieRepository().getNowPlaying(currentPage + 1).then((val) {
+          currentPage = val.page;
+          setState(() {
+            movie.addAll(val.results);
+          });
+        });
+      }
+    }
+    return true;
+  }
 
   @override
   void initState() {
@@ -73,16 +92,27 @@ class _MovieListState extends State<MovieList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: movie.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[Text(movie[index].title)],
-          ),
-        );
-      },
+    return NotificationListener(
+      onNotification: onNotificationHandler,
+      child: ListView.builder(
+        itemCount: movie.length,
+        controller: scrollController,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Card(
+                  child: ListTile(
+                    title: Text(movie[index].title),
+                    trailing: Icon(Icons.more_vert),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
