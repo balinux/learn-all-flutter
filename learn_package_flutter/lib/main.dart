@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:imissupgk/model/loginModel.dart';
 import 'package:rjp/rjp.dart';
 import 'package:rjp/rjp_multiply.dart';
+import 'package:imissupgk/imissupgk.dart';
 
 void main() {
   runApp(MyApp());
@@ -51,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Calculator _calculator = Calculator();
   Multiply _multiply = Multiply();
+  Imissu imissu = Imissu();
 
   void _incrementCounter() {
     setState(() {
@@ -61,6 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  void loginToImissu() async {
+    LoginModel logindata = await imissu.loginToImissu('rio', 'unud2018');
+    print(logindata.accessToken);
   }
 
   @override
@@ -112,6 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
               '${_multiply.multiplyNumber(4, 2)}',
               style: Theme.of(context).textTheme.headline4,
             ),
+            ElevatedButton(
+                onPressed: () {
+                  loginToImissu();
+                },
+                child: Text("login"))
           ],
         ),
       ),
